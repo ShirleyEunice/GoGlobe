@@ -1,35 +1,28 @@
 const express = require("express");
-const mysql = require("mysql");
 const cors = require("cors");
+const bodyParser = require("body-parser");
+const authRoutes = require("./routes/authRoutes");
+const bookingRoutes = require ("./routes/bookingRoutes");
+
 
 const app = express();
-app.use(cors());
+// app.use(cors());
+const corsOptions = {
+  origin:'http://localhost:3000',
+  methods:['POST','GET','PUT','DELETE']
+};
+app.use(cors(corsOptions));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "shirley@352000",
-  database: "TourManagement"
-})
+// Serve images from uploads folder
+app.use("/uploads", express.static("uploads"));
 
-app.post("/signup", (req, res)=>
-{
-  const sql = "INSERT INTO login('name', 'email', 'password') VALUES (?)";
-  const values = [
-    req.body.name,
-    req.boday.email,
-    req.body.password
-  ]
-  db. query(sql, [values], (err, data)=>
-  {
-    if(err)
-    {
-      return res.json(data);
-    }
-  })
-})
+// Use Routes
+app.use("/api", authRoutes);
+app.use("/api", bookingRoutes);
 
-app.listen(8081,()=>
-{
-  console.log("Listening");
-})
+
+
+const PORT = 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
